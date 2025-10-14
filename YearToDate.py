@@ -64,6 +64,9 @@ class GateCountFetcher:
         
         df = df[[date_col, 'name', 'sumins', 'sumouts']]  # Include sumouts
         df = df.rename(columns={date_col: 'DateTime', 'name': 'location', 'sumins': 'Ingress', 'sumouts': 'Egress'})
+        df['DateTime'] = pd.to_datetime(df['DateTime'])
+        df['DateTime'] = df['DateTime'].dt.tz_convert('America/Chicago')
+        df['DateTime'] = df['DateTime'].dt.tz_localize(None)
         df = df[(df.Ingress != 0) | (df.Egress != 0)]  # Filter for non-zero ingress OR egress
         df['Gate'] = df['location'].apply(lambda x: 'THE LIVING WORLD' if x in ['Treetop', 'TLW1'] else 'SOUTH GATE')
         df = df.groupby(['DateTime', 'Gate'], as_index=False)[['Ingress', 'Egress']].sum() 
@@ -73,7 +76,8 @@ class GateCountFetcher:
 
     def write_to_db(self, df):
         con = duckdb.connect(database=os.path.join(os.path.dirname(__file__), '.', 'data', 'YTD.data.duckdb'))
-        con.execute("CREATE TABLE IF NOT EXISTS GateCount (DateTime TIMESTAMP, Gate VARCHAR, Ingress INTEGER, Egress INTEGER);")  
+        con.execute("DROP TABLE IF EXISTS GateCount;")
+        con.execute("CREATE TABLE GateCount (DateTime TIMESTAMP, Gate VARCHAR, Ingress INTEGER, Egress INTEGER);")  
         con.execute("INSERT INTO GateCount SELECT * FROM df;")
         logger.info("Gate count data written to DuckDB.")
 

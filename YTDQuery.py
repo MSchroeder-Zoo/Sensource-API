@@ -144,20 +144,6 @@ if __name__ == "__main__":
     query_ytd_data()
     
     # Optionally export to CSV
-    # export_to_csv()
+    export_to_csv()
     
-    # Example custom query:
-    # print("\nCUSTOM QUERY - Weekend vs Weekday:")
-    # custom_query("""
-    #     SELECT 
-    #         CASE 
-    #             WHEN DAYOFWEEK(DateTime) IN (1, 7) THEN 'Weekend'
-    #             ELSE 'Weekday'
-    #         END as day_type,
-    #         Gate,
-    #         SUM(Ingress) as total_ingress,
-    #         SUM(Egress) as total_egress
-    #     FROM GateCount
-    #     GROUP BY day_type, Gate
-    #     ORDER BY day_type, Gate;
-    # """)
+   

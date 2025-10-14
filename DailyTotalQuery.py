@@ -43,3 +43,17 @@ for row in summary:
 
 # Close connection
 con.close()
+
+def export_to_csv(output_file='daily_gate_data.csv'):
+    """Export all data to CSV"""
+    db_path = os.path.join(os.path.dirname(__file__), '.', 'data', 'ZooData.duckdb')
+    con = duckdb.connect(database=db_path, read_only=True)
+    
+    df = con.execute("SELECT * FROM GateCount ORDER BY Date, Gate;").fetchdf()
+    df.to_csv(output_file, index=False)
+    print(f"Exported {len(df):,} records to {output_file}")
+    
+    con.close()
+
+if __name__ == "__main__":
+    export_to_csv()
